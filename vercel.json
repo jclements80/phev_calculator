@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd phev-calculator && npm run build",
+  "outputDirectory": "phev-calculator/dist",
+  "installCommand": "cd phev-calculator && npm install",
+  "framework": "vite",
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
