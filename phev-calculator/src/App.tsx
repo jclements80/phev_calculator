@@ -20,7 +20,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-bg">
-      <div className="max-w-md mx-auto px-4 pb-10">
+      <div className="max-w-md mx-auto px-4 pb-10 pt-[50px]">
         {/* Header */}
         <header className="flex items-center justify-between py-5">
           <div>
