@@ -15,17 +15,36 @@ import ResultCard from './ResultCard'
 import VerdictBanner from './VerdictBanner'
 import BreakevenRow from './BreakevenRow'
 
+// Format raw digit string as implied-decimal money value (e.g. "350" → "3.50")
+function fmtDigits(digits: string): string {
+  if (!digits) return ''
+  const padded = digits.padStart(3, '0')
+  const intPart = padded.slice(0, -2).replace(/^0+/, '') || '0'
+  return `${intPart}.${padded.slice(-2)}`
+}
+
+function parseDigits(digits: string): number {
+  return digits ? parseInt(digits, 10) / 100 : 0
+}
+
+function digitChange(
+  e: React.ChangeEvent<HTMLInputElement>,
+  setter: (s: string) => void
+) {
+  setter(e.target.value.replace(/\D/g, ''))
+}
+
 export default function Calculator() {
   const { profile } = useVehicleStore()
 
-  const [gasPrice, setGasPrice]       = useState('')
-  const [chargerMode, setChargerMode] = useState<ChargerMode>('kwh')
-  const [chargerRate, setChargerRate] = useState('')
-  const [chargerKw, setChargerKw]     = useState('6.6')
+  const [gasPriceDigits, setGasPriceDigits]   = useState('')
+  const [chargerMode, setChargerMode]          = useState<ChargerMode>('kwh')
+  const [chargerRateDigits, setChargerRateDigits] = useState('')
+  const [chargerKwDigits, setChargerKwDigits]  = useState('660')
 
-  const gas   = parseFloat(gasPrice)
-  const rate  = parseFloat(chargerRate)
-  const kw    = parseFloat(chargerKw)
+  const gas   = parseDigits(gasPriceDigits)
+  const rate  = parseDigits(chargerRateDigits)
+  const kw    = parseDigits(chargerKwDigits)
   const hourlyReady = chargerMode === 'hourly' ? kw > 0 : true
   const ready = gas > 0 && rate > 0 && hourlyReady
 
@@ -51,13 +70,11 @@ export default function Calculator() {
         <div className="flex items-center gap-2">
           <span className="text-slate-400 text-lg">$</span>
           <input
-            type="number"
-            inputMode="decimal"
+            type="text"
+            inputMode="numeric"
             placeholder="3.50"
-            min={0}
-            step={0.01}
-            value={gasPrice}
-            onChange={e => setGasPrice(e.target.value)}
+            value={fmtDigits(gasPriceDigits)}
+            onChange={e => digitChange(e, setGasPriceDigits)}
             className="flex-1 bg-transparent text-gas text-3xl font-bold placeholder-slate-700 focus:outline-none"
           />
           <span className="text-slate-500 text-sm">/gal</span>
@@ -89,13 +106,11 @@ export default function Calculator() {
         <div className="flex items-center gap-2">
           <span className="text-slate-400 text-lg">$</span>
           <input
-            type="number"
-            inputMode="decimal"
+            type="text"
+            inputMode="numeric"
             placeholder={chargerMode === 'kwh' ? '0.35' : '1.50'}
-            min={0}
-            step={0.01}
-            value={chargerRate}
-            onChange={e => setChargerRate(e.target.value)}
+            value={fmtDigits(chargerRateDigits)}
+            onChange={e => digitChange(e, setChargerRateDigits)}
             className="flex-1 bg-transparent text-ev text-3xl font-bold placeholder-slate-700 focus:outline-none"
           />
           <span className="text-slate-500 text-sm">{modeLabel}</span>
@@ -108,13 +123,11 @@ export default function Calculator() {
             </label>
             <div className="flex items-center gap-2">
               <input
-                type="number"
-                inputMode="decimal"
-                placeholder="6.6"
-                min={0.1}
-                step={0.1}
-                value={chargerKw}
-                onChange={e => setChargerKw(e.target.value)}
+                type="text"
+                inputMode="numeric"
+                placeholder="6.60"
+                value={fmtDigits(chargerKwDigits)}
+                onChange={e => digitChange(e, setChargerKwDigits)}
                 className="flex-1 bg-transparent text-slate-200 text-2xl font-semibold placeholder-slate-700 focus:outline-none"
               />
               <span className="text-slate-500 text-sm">kW</span>
